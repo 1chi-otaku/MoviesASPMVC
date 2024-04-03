@@ -1,0 +1,28 @@
+﻿<div style="padding-top:30px">
+    <h3>Top 10 movies</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Director</th>
+                <th>Genre</th>
+                <th>Image</th>
+                <th>Info</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in ViewBag.Movies)
+            {
+                <tr>
+                    <td>@movie.Title</td>
+                    <td>@movie.Year</td>
+                    <td>@movie.Director</td>
+                    <td>@movie.Genre</td>
+                    <td><img src="@Url.Content(movie.Img)" alt="@movie.Title" style="max-width: 100px; max-height: 100px;" /></td>
+                    <td>@movie.Info</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
