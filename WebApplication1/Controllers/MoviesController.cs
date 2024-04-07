@@ -21,5 +21,41 @@ namespace WebApplication1.Controllers
             ViewBag.Movies = movies;
             return View();
         }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var student = await _db.Movies
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var student = await _db.Movies.FindAsync(id);
+            if (student != null)
+            {
+                _db.Movies.Remove(student);
+            }
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool MovieExists(int id)
+        {
+            return _db.Movies.Any(e => e.Id == id);
+        }
     }
 }

@@ -64,6 +64,7 @@
                     <p><strong>Director:</strong> @movie.Director</p>
                     <p><strong>Genre:</strong> @movie.Genre</p>
                     <p>@movie.Info</p>
+                    <a asp-action="Delete" asp-route-id="@movie.Id">Delete</a>
                 </div>
             </div>
         }
