@@ -53,6 +53,24 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Title,Year,Director,Genre,Info")] Movies movie)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.Add(movie);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(movie);
+        }
+
         private bool MovieExists(int id)
         {
             return _db.Movies.Any(e => e.Id == id);
