@@ -57,5 +57,15 @@ namespace WebApplication1.Controllers
         {
             return _db.Movies.Any(e => e.Id == id);
         }
+
+        public IActionResult Details(int id)
+        {
+            var movie = _db.Movies.FirstOrDefault(m => m.Id == id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+            return View(movie);
+        }
     }
 }
