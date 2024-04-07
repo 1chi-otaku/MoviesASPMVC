@@ -1,18 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
 using WebApplication1.Models;
+
 
 namespace WebApplication1.Controllers
 {
     public class MoviesController : Controller
     {
         private readonly MoviesContext _db;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public MoviesController(MoviesContext db)
+        public MoviesController(MoviesContext db, IWebHostEnvironment appEnvironment)
         {
             _db = db;
+            _appEnvironment = appEnvironment;
         }
 
         public async Task<IActionResult> Index()
@@ -60,10 +62,26 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Year,Director,Genre,Info")] Movies movie)
+        [RequestSizeLimit(1000000000)]
+        public async Task<IActionResult> Create([Bind("Id,Title,Year,Director,Genre,Info")] Movies movie, IFormFile uploadedFile)
         {
+            
             if (ModelState.IsValid)
             {
+                if (uploadedFile != null)
+                {
+                    string path = "/movies/" + uploadedFile.FileName;
+
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                    {
+                        await uploadedFile.CopyToAsync(fileStream);
+                    }
+
+
+                    movie.Img = path;
+
+
+                }
                 _db.Add(movie);
                 await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
