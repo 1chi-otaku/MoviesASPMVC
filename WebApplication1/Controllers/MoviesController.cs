@@ -65,7 +65,7 @@ namespace WebApplication1.Controllers
         [RequestSizeLimit(1000000000)]
         public async Task<IActionResult> Create([Bind("Id,Title,Year,Director,Genre,Info")] Movies movie, IFormFile uploadedFile)
         {
-            
+
             if (ModelState.IsValid)
             {
                 if (uploadedFile != null)
@@ -103,5 +103,73 @@ namespace WebApplication1.Controllers
             }
             return View(movie);
         }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var movies = await _db.Movies.FindAsync(id);
+            if (movies == null)
+            {
+                return NotFound();
+            }
+            return View(movies);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Year,Director,Genre,Info,Img")] Movies movie, IFormFile uploadedFile)
+        {
+            if (id != movie.Id)
+            {
+                return NotFound();
+            }
+
+            string oldImagePath = movie.Img;
+
+            if (uploadedFile != null)
+            {
+                string path = "/movies/" + uploadedFile.FileName;
+
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + path, FileMode.Create))
+                {
+                    await uploadedFile.CopyToAsync(fileStream);
+                }
+
+                movie.Img = path;
+            }
+
+            if (ModelState.IsValid || uploadedFile == null)
+            {
+                try
+                {
+                    if (uploadedFile == null)
+                    {
+                        movie.Img = oldImagePath;
+                    }
+
+                    _db.Update(movie);
+                    await _db.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!MovieExists(movie.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(movie);
+        }
+
     }
 }
