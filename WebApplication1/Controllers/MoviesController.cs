@@ -17,6 +17,11 @@ namespace WebApplication1.Controllers
             _appEnvironment = appEnvironment;
         }
 
+        private bool CheckName(string title)
+        {
+            return _db.Movies.Any(movie => movie.Title == title); 
+        }
+
         public async Task<IActionResult> Index()
         {
             IEnumerable<Movies> movies = await Task.Run(() => _db.Movies);
@@ -66,8 +71,14 @@ namespace WebApplication1.Controllers
         public async Task<IActionResult> Create([Bind("Id,Title,Year,Director,Genre,Info")] Movies movie, IFormFile uploadedFile)
         {
 
+            if (CheckName(movie.Title))
+            {
+                ModelState.AddModelError("", "Film with such name already exists.");
+            }
+
             if (ModelState.IsValid)
             {
+
                 if (uploadedFile != null)
                 {
                     string path = "/movies/" + uploadedFile.FileName;
@@ -128,6 +139,7 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
+
 
             string oldImagePath = movie.Img;
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApplication1.Models
 {
@@ -15,6 +16,7 @@ namespace WebApplication1.Models
         public int Year { get; set; }
 
         [Required(ErrorMessage = "Director can not be empty!")]
+        [RegularExpression("^[a-zA-Z ]+$", ErrorMessage = "Director must contain only letters.")]
         public string? Director { get; set; }
 
         [Required(ErrorMessage = "Genre can not be empty!")]
